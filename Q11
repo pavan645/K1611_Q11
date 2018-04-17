@@ -1,0 +1,101 @@
+11. The following processes are being scheduled using a preemptive, round robin scheduling algorithm. Each process is assigned a numerical priority, with a higher number indicating a higher relative priority. In addition to the processes listed below, the system also has an idle task (which consumes no CPU resources and is identified as P_idle ). This task has priority 0 and is scheduled whenever the system has no other available processes to run. The length of a time quantum is 10 units. If a process is preempted by a higher-priority process, the preempted process is placed at the end of the queue. Thread Priority Burst Arrival P1  40  20  0 P2  30  25  25 P3  30  25  30 P4  35  15  60 P5  5  10  100 P6  10  10  105 Write a C code to  a. Show the scheduling order of the processes using a Gantt chart. b. What is the turnaround time for each process? c. What is the waiting time for each process? d. What is the CPU utilization rate?  
+Program:- 
+ 
+#include<iostream> 
+#include<conio.h> 
+using namespace std; 
+ 
+void SearchStack01(int pnt,int tm); 
+void SearchStack02(int pnt, int tm); 
+void AddQue(int pnt); 
+int at[50], bt[50], ct[50]={0}, qt, rqi[50]={0}, c=0, st, flg=0, tm=0, noe=0, pnt=0, btm[50]={0}, tt, wt; 
+float att, awt; 
+ 
+main() 
+{ 
+cout<<"ROUND ROBIN ALGO : INPUT 5 PROCESSES\n"; 
+cout<<"\n\t\tHere Some Attrib use in program \n"; 
+cout<<"AT = Arrival Time \nBT = Burst Time\nCT = Completion Time\nTT = Turnaround Time\nWT = Waiting Time\n\n"; 
+for(int x=0;x<5;x++){ 
+cout<<"\nProcess "<<x+1; 
+cout<<"\nAT="; 
+cin>>at[x]; 
+cout << "BT="; 
+cin>>bt[x]; 
+btm[x]=bt[x];} 
+cout<<"\nEnter time quantum:"; 
+cin>>qt; 
+//system("CLS"); 
+cout<<endl<<"GANTT CHART"<<endl<<at[0]; 
+do{ 
+if(flg==0){ 
+st=at[0]; 
+//---ReduceBT 
+if(btm[0]<=qt){ 
+tm=st+btm[0]; 
+btm[0]=0; 
+SearchStack01(pnt,tm);} 
+else{ 
+btm[0]=btm[0]-qt; 
+tm=st+qt; 
+SearchStack01(pnt,tm); 
+AddQue(pnt);} 
+}//if 
+else{ 
+pnt=rqi[0]-1; 
+st=tm; 
+//---DeleteQue 
+for(int x=0;x<noe && noe!=1;x++){ 
+rqi[x]=rqi[x+1];} 
+noe--; 
+//---ReduceBT 
+if(btm[pnt]<=qt){ 
+tm=st+btm[pnt]; 
+btm[pnt]=0; 
+SearchStack02(pnt, tm);} 
+else{ 
+btm[pnt]=btm[pnt]-qt; 
+tm=st+qt; 
+SearchStack02(pnt, tm); 
+AddQue(pnt);} 
+}//else 
+//AssignCTvalue 
+if(btm[pnt]==0){ 
+ct[pnt]=tm; 
+}//if 
+flg++; 
+cout<<"]-P"<<pnt+1<<"-["<<tm; 
+}while(noe!=0); 
+cout<<"\n\nPROCESS\t AT\t BT\t CT\t TT\t WT\n"; 
+for(int x=0;x<5;x++){ 
+tt=ct[x]-at[x]; 
+wt=tt-bt[x]; 
+cout<<"P"<<x+1<<" \t "<<at[x]<<" \t "<<bt[x]<<" \t "<<ct[x]<<" \t "<<tt<<" \t "<<wt<<"\n"; 
+awt=awt+wt; 
+att=att+tt; 
+}//for 
+cout<<"\nAVERAGE TT: "<<att/5<<"\nAVERAGE WT: "<<awt/5; 
+}//main 
+void SearchStack01(int pnt,int tm){ 
+for(int x=pnt+1;x<5;x++){ 
+if(at[x]<=tm){ 
+rqi[noe]=x+1; 
+noe++;} 
+}//for 
+}//void 
+void SearchStack02(int pnt, int tm){ 
+for(int x=pnt+1;x<5;x++){ 
+//---CheckQue 
+int fl=0; 
+for(int y=0;y<noe;y++){ 
+if(rqi[y]==x+1){ 
+fl++;}} 
+if(at[x]<=tm && fl==0 && btm[x]!=0){ 
+rqi[noe]=x+1; 
+noe++;} 
+}//for 
+}//void 
+void AddQue(int pnt){ 
+rqi[noe]=pnt+1; 
+noe++; 
+}//void 
